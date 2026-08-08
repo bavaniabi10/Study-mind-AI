@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Header } from './components/Header';
 import { Navigation, TabType } from './components/Navigation';
 import { DoubtSolver } from './components/DoubtSolver';
 import { NotesGenerator } from './components/NotesGenerator';
