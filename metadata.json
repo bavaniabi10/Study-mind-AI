@@ -1,0 +1,6 @@
+{
+  "name": "StudyMind AI",
+  "description": "An intelligent college study assistant agent for resolving doubts, generating comprehensive notes, taking custom quizzes, building study plans, and spaced-repetition revision.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
