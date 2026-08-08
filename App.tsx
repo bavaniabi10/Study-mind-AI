@@ -1,99 +1,164 @@
-import { NoteResponse, QuizResult, StudyPlan, Flashcard } from '../types';
+import React, { useState, useEffect } from 'react';
+import { Header } from './components/Header';
+import { Navigation, TabType } from './components/Navigation';
+import { DoubtSolver } from './components/DoubtSolver';
+import { NotesGenerator } from './components/NotesGenerator';
+import { QuizArena } from './components/QuizArena';
+import { StudyPlanner } from './components/StudyPlanner';
+import { RevisionHub } from './components/RevisionHub';
+import { SavedLibrary } from './components/SavedLibrary';
+import { NoteResponse, StudyPlan, SubjectCategory } from './types';
+import { storage } from './lib/storage';
+import { GraduationCap, Heart, Sparkles, ShieldCheck } from 'lucide-react';
 
-const NOTES_KEY = 'studymind_saved_notes';
-const QUIZZES_KEY = 'studymind_quiz_results';
-const PLANS_KEY = 'studymind_saved_plans';
-const CARDS_KEY = 'studymind_revision_cards';
+export default function App() {
+  const [activeTab, setActiveTab] = useState<TabType>('doubt');
+  const [currentSubject, setCurrentSubject] = useState<SubjectCategory>('Computer Science & AI');
+  const [customSubjectInput, setCustomSubjectInput] = useState('');
 
-export const storage = {
-  getNotes: (): NoteResponse[] => {
-    try {
-      const data = localStorage.getItem(NOTES_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch {
-      return [];
-    }
-  },
-  saveNote: (note: NoteResponse) => {
-    const notes = storage.getNotes().filter((n) => n.id !== note.id);
-    notes.unshift(note);
-    localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
-  },
-  deleteNote: (id: string) => {
-    const notes = storage.getNotes().filter((n) => n.id !== id);
-    localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
-  },
+  // Cross-Navigation Data Transfer States
+  const [notesTopic, setNotesTopic] = useState('');
+  const [notesContext, setNotesContext] = useState('');
+  const [quizTopic, setQuizTopic] = useState('');
 
-  getQuizzes: (): QuizResult[] => {
-    try {
-      const data = localStorage.getItem(QUIZZES_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch {
-      return [];
-    }
-  },
-  saveQuizResult: (result: QuizResult) => {
-    const quizzes = storage.getQuizzes();
-    quizzes.unshift(result);
-    localStorage.setItem(QUIZZES_KEY, JSON.stringify(quizzes));
-  },
+  // Library Counts
+  const [savedNotesCount, setSavedNotesCount] = useState(0);
+  const [quizzesCount, setQuizzesCount] = useState(0);
+  const [activePlansCount, setActivePlansCount] = useState(0);
 
-  getPlans: (): StudyPlan[] => {
-    try {
-      const data = localStorage.getItem(PLANS_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch {
-      return [];
-    }
-  },
-  savePlan: (plan: StudyPlan) => {
-    const plans = storage.getPlans().filter((p) => p.id !== plan.id);
-    plans.unshift(plan);
-    localStorage.setItem(PLANS_KEY, JSON.stringify(plans));
-  },
-  updatePlanTask: (planId: string, dayNumber: number, completed: boolean) => {
-    const plans = storage.getPlans();
-    const plan = plans.find((p) => p.id === planId);
-    if (plan) {
-      const task = plan.dailyTasks.find((t) => t.dayNumber === dayNumber);
-      if (task) {
-        task.completed = completed;
-        localStorage.setItem(PLANS_KEY, JSON.stringify(plans));
-      }
-    }
-  },
-  deletePlan: (id: string) => {
-    const plans = storage.getPlans().filter((p) => p.id !== id);
-    localStorage.setItem(PLANS_KEY, JSON.stringify(plans));
-  },
+  const refreshCounts = () => {
+    setSavedNotesCount(storage.getNotes().length);
+    setQuizzesCount(storage.getQuizzes().length);
+    setActivePlansCount(storage.getPlans().length);
+  };
 
-  getFlashcards: (): Flashcard[] => {
-    try {
-      const data = localStorage.getItem(CARDS_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch {
-      return [];
-    }
-  },
-  saveFlashcards: (newCards: Flashcard[]) => {
-    const existing = storage.getFlashcards();
-    const existingIds = new Set(existing.map((c) => c.id));
-    const toAdd = newCards.filter((c) => !existingIds.has(c.id));
-    const updated = [...toAdd, ...existing];
-    localStorage.setItem(CARDS_KEY, JSON.stringify(updated));
-  },
-  updateFlashcardStatus: (cardId: string, status: 'new' | 'learning' | 'mastered', easeRating?: 'hard' | 'good' | 'easy') => {
-    const cards = storage.getFlashcards();
-    const card = cards.find((c) => c.id === cardId);
-    if (card) {
-      card.status = status;
-      if (easeRating) card.easeRating = easeRating;
-      localStorage.setItem(CARDS_KEY, JSON.stringify(cards));
-    }
-  },
-  deleteFlashcard: (cardId: string) => {
-    const cards = storage.getFlashcards().filter((c) => c.id !== cardId);
-    localStorage.setItem(CARDS_KEY, JSON.stringify(cards));
-  }
-};
+  useEffect(() => {
+    refreshCounts();
+  }, []);
 
+  // Cross tab navigation helpers
+  const handleNavigateToNotes = (topic: string, textContext?: string) => {
+    setNotesTopic(topic);
+    if (textContext) setNotesContext(textContext);
+    setActiveTab('notes');
+  };
+
+  const handleNavigateToQuiz = (topic: string) => {
+    setQuizTopic(topic);
+    setActiveTab('quiz');
+  };
+
+  const handleNavigateToDoubt = (question: string) => {
+    setActiveTab('doubt');
+  };
+
+  const handleSelectNoteFromLibrary = (note: NoteResponse) => {
+    setNotesTopic(note.title);
+    setNotesContext(note.executiveSummary);
+    setActiveTab('notes');
+  };
+
+  const handleSelectPlanFromLibrary = (plan: StudyPlan) => {
+    setActiveTab('planner');
+  };
+
+  return (
+    <div id="app-root" className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+      
+      {/* App Header */}
+      <Header
+        currentSubject={currentSubject}
+        onSubjectChange={setCurrentSubject}
+        customSubjectInput={customSubjectInput}
+        onCustomSubjectChange={setCustomSubjectInput}
+        savedNotesCount={savedNotesCount}
+        quizzesCount={quizzesCount}
+        activePlansCount={activePlansCount}
+      />
+
+      {/* Tab Navigation */}
+      <Navigation
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        savedNotesCount={savedNotesCount}
+      />
+
+      {/* Main Content View */}
+      <main id="main-content" className="flex-1 py-4">
+        {activeTab === 'doubt' && (
+          <DoubtSolver
+            subject={currentSubject}
+            customSubject={customSubjectInput}
+            onNavigateToNotes={handleNavigateToNotes}
+            onNavigateToQuiz={handleNavigateToQuiz}
+          />
+        )}
+
+        {activeTab === 'notes' && (
+          <NotesGenerator
+            subject={currentSubject}
+            customSubject={customSubjectInput}
+            initialTopic={notesTopic}
+            initialContext={notesContext}
+            onNoteSaved={refreshCounts}
+            onNavigateToQuiz={handleNavigateToQuiz}
+          />
+        )}
+
+        {activeTab === 'quiz' && (
+          <QuizArena
+            subject={currentSubject}
+            customSubject={customSubjectInput}
+            initialTopic={quizTopic}
+            onQuizCompleted={refreshCounts}
+            onNavigateToNotes={handleNavigateToNotes}
+            onNavigateToDoubt={handleNavigateToDoubt}
+          />
+        )}
+
+        {activeTab === 'planner' && (
+          <StudyPlanner
+            subject={currentSubject}
+            customSubject={customSubjectInput}
+            onPlanSaved={refreshCounts}
+          />
+        )}
+
+        {activeTab === 'revision' && (
+          <RevisionHub
+            subject={currentSubject}
+            customSubject={customSubjectInput}
+          />
+        )}
+
+        {activeTab === 'library' && (
+          <SavedLibrary
+            onSelectNote={handleSelectNoteFromLibrary}
+            onSelectPlan={handleSelectPlanFromLibrary}
+          />
+        )}
+      </main>
+
+      {/* Simple Footer */}
+      <footer id="app-footer" className="bg-slate-900/80 border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-400 mt-auto">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div className="flex items-center space-x-1.5 font-medium">
+            <GraduationCap className="w-4 h-4 text-indigo-400" />
+            <span>StudyMind AI Assistant</span>
+            <span className="text-slate-600">•</span>
+            <span>Empowering College Students</span>
+          </div>
+
+          <div className="flex items-center space-x-4 text-[11px] text-slate-500">
+            <span className="flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              Gemini 3.6 Flash Server Engine
+            </span>
+            <span>Local Storage Sync</span>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  );
+}
