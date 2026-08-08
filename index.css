@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+.markdown-body h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 0.25rem;
+}
+
+.markdown-body h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #818cf8;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.markdown-body h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #38bdf8;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.markdown-body p {
+  margin-bottom: 0.75rem;
+  color: #cbd5e1;
+}
+
+.markdown-body ul, .markdown-body ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0.75rem;
+  list-style-type: disc;
+}
+
+.markdown-body ol {
+  list-style-type: decimal;
+}
+
+.markdown-body li {
+  margin-bottom: 0.25rem;
+  color: #cbd5e1;
+}
+
+.markdown-body code {
+  background-color: #0f172a;
+  border: 1px solid #1e293b;
+  color: #38bdf8;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.375rem;
+  font-size: 0.825rem;
+  font-family: monospace;
+}
+
+.markdown-body pre {
+  background-color: #020617;
+  border: 1px solid #1e293b;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-body blockquote {
+  border-left: 4px solid #6366f1;
+  padding-left: 0.75rem;
+  color: #94a3b8;
+  font-style: italic;
+  margin-bottom: 0.75rem;
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.markdown-body th, .markdown-body td {
+  border: 1px solid #334155;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.markdown-body th {
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-weight: 600;
+}
+
