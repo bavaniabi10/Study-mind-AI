@@ -414,11 +414,12 @@ Each flashcard should test a fundamental concept, formula, mechanism, or distinc
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`StudyMind AI Server running on http://0.0.0.0:${PORT}`);
+  }
+
+export default app;
+
+if (process.env.NODE_ENV !== "production") {
+  startServer().catch((err) => {
+    console.error("Failed to start server:", err);
   });
 }
-
-startServer().catch((err) => {
-  console.error("Failed to start server:", err);
-});
