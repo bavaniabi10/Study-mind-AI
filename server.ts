@@ -416,10 +416,8 @@ Each flashcard should test a fundamental concept, formula, mechanism, or distinc
 
   }
 
-export default app;
+startServer().catch((err) => {
+  console.error("Failed to start server:", err);
+});
 
-if (process.env.NODE_ENV !== "production") {
-  startServer().catch((err) => {
-    console.error("Failed to start server:", err);
-  });
-}
+export default app;
