@@ -41,45 +41,7 @@ export const DoubtSolver: React.FC<DoubtSolverProps> = ({
 
   const activeSubjectName = subject === 'Custom' ? (customSubject || 'General') : subject;
 
-  const handleSolve = async (overrideQuestion?: string, overrideStyle?: ExplanationStyle) => {
-    const qToSolve = overrideQuestion || question;
-    const styleToUse = overrideStyle || style;
-
-    if (!qToSolve.trim()) {
-      setError('Please enter your study doubt or question.');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    setResponse(null);
-    setCheckedTakeaways({});
-
-    try {
-      const res = await fetch('/api/doubt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subject: activeSubjectName,
-          question: qToSolve,
-          style: styleToUse,
-          contextText: contextText.trim() ? contextText : undefined
-        })
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `Server error: ${res.status}`);
-      }
-
-      const data: DoubtResponse = await res.json();
-      setResponse(data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to solve doubt. Please check your API key/network connection.');
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleSolve = async (overrideQuestion?: string, overrideStyle?: ExplanationStyle) => { const qToSolve = overrideQuestion || question; const styleToUse = overrideStyle || style; if (!qToSolve.trim()) { setError('Please enter your study doubt or question.'); return; } setLoading(true); setError(null); setResponse(null); setCheckedTakeaways({}); try { const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (process as any).env?.GEMINI_API_KEY; if (!apiKey) { throw new Error('Gemini API key is missing in Environment Variables.'); } const promptText = You are an academic mentor explaining for subject: "${activeSubjectName}". Explanation style: "${styleToUse}". Context: ${contextText.trim() ? contextText : 'None'} Doubt Question: ${qToSolve} Respond ONLY in a JSON object format matching this structure: { "summary": "1-2 sentence quick answer summary", "answer": "Detailed answer formatted in markdown", "analogies": "Simple real-world analogy if applicable", "keyTakeaways": ["Point 1", "Point 2", "Point 3"], "commonMisconceptions": ["Misconception 1", "Misconception 2"], "suggestedFollowUps": ["Follow-up question 1", "Follow-up question 2"] } ; const res = await fetch(https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }], generationConfig: { responseMimeType: "application/json" } }) }); if (!res.ok) { const errData = await res.json().catch(() => ({})); throw new Error(errData.error?.message || Server error: ${res.status}); } const data = await res.json(); const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text; if (!rawText) throw new Error('No response generated.'); const parsedResponse: DoubtResonse = JSON.parse(rawText); setResponse(parsedResponse); } catch (err: any) { setError(err.message || 'Failed to solve doubt. Please check your API key/network connection.'); } finally { setLoading(false); } };
 
   const toggleSpeak = () => {
     if (!response) return;
