@@ -123,7 +123,7 @@ if (!apiKey) {
 
 const promptText = "Explain the student question clearly.";
 
-const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite-001:generateContent?key=${apiKey}`;
 
 const res = await fetch(apiUrl, {
   method: "POST",
