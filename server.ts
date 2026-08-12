@@ -13,6 +13,7 @@ async function startServer() {
   // Gemini AI client initialization
   const getGeminiClient = () => {
     const apiKey = process.env.GEMINI_API_KEY;
+    console.log("SERVER GEMINI KEY:", apiKey ? "FOUND" : "MISSING");
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not configured in environment variables.");
     }
@@ -412,6 +413,9 @@ Each flashcard should test a fundamental concept, formula, mechanism, or distinc
     app.get("*", (_req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
+    app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
   }
 
   }
@@ -419,5 +423,3 @@ Each flashcard should test a fundamental concept, formula, mechanism, or distinc
 startServer().catch((err) => {
   console.error("Failed to start server:", err);
 });
-
-export default app;
